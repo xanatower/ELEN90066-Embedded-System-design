@@ -7,7 +7,7 @@ Hardware: ATMEGA16 @ 8Mhz
 
 DESCRIPTION:
 	Main and functions for Game Console basic sample code
-TEST COMMIT
+
 *************************************************************************/
 
 
