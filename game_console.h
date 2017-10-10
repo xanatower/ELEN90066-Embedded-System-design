@@ -17,7 +17,7 @@ DESCRIPTION:
 
 #define byte unsigned char 
 
-#define F_CPU = 7379300L
+//#define F_CPU = 7379300L
 
 
 /*ON OFF*/
@@ -33,6 +33,8 @@ DESCRIPTION:
 #define FALSE 0
 #define FORWARD 0x00
 #define BACK 0xFF 
+#define BOTTOM 0x00
+#define TOP 0xFF
 
 /*SET and GET MACRO*/
 
@@ -78,7 +80,7 @@ DESCRIPTION:
 ///#define MULTI_LINES(STATE) SET(DDR?,(_BV(P?#)|_BV(P?#)|_BV(P?#)),DIR)
 
 #define BAT_LOW_LED(STATE) SET(PORTA,_BV(PA1),~STATE)
-#define LCD_BACKLIGHT(STATE) SET(PORTB,_BV(PB3), ~STATE)
+#define LCD_BACKLIGHT(STATE) SET(PORTB,_BV(PB3), STATE)
 
 
 
