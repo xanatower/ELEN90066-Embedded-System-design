@@ -59,53 +59,77 @@ byte LCD_data_tx(byte tx_byte) //Sends a data byte
 void SPI_MasterInit(void)
 {	
 
+	//P140
+
 	/* Set MOSI and SCK output, all others input */
 	DDR_SPI = (1 << DD_MOSI) | (1 << DD_SCK);
 	/* Enable SPI, Master, set clock rate fck/16 */
 	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+	//SPCR: SPI Control Register
+	//SPE: SPI Enable
+	//SPR1, SPR0: SPI Clock Rate Select 1 and 0
 }
 
-void SPI_MasterTransmit(char cData)
+
+
+//CS: CHIP SELECT
+//CD: 
+
+
+
+//customeised SPI_MasterTransmit()
+//P142
+void LCD_TX(byte type, byte cData)
 {	
+	//2 MODES: type can be COMMAND or DATA
+	LCD_CD(LCD_type); //Instruction: Command / transfer Data
+	LCD_CS (HIGH); //select this chip
+
+	//cData is the input data that will be transmitted
+
 	//SPI Data Register SPDR
-	
+
 	/* Start transmission */
 	SPDR = cData;
 
 	/* Wait for transmission complete */
 	while (!(SPSR & (1 << SPIF)));
+	LCD_CS(LOW); //deselect this chip
 
 }
 
 
-LCD_CS(LOW); //Chip Deselect
-LCD_CS_DIR(OUT);
 
-LCD_CD_DIR(OUT); 
+//return byte
+byte LCD_initialise(void)
+{	
+	//initialise MCU pin
+	LCD_CS(LOW); //Chip Deselect
+	LCD_CS_DIR(OUT);
+	
+	LCD_CD_DIR(OUT); 
+	
+	LCD_RST_DIR(OUT);
+	LCD_RST(HIGH);
+	_delay_ms(10);
+	
+	LCD_RST(LOW);
+	_delay_ms(10);
 
-LCD_RST_DIR(OUT);
-LCD_RST(HIGH);
-_delay_ms(10);
-
-LCD_RST(LOW);
-_delay_ms(10);
-
-
-LCD_initialise(void)
-{
-	LCD_command_tx(0x40); //Display start line 0
-	LCD_command_tx(0xA1); //SEG reverse
-	LCD_command_tx(0xC0); //Normal COM0~COM63
-	LCD_command_tx(0xA4); //Disable -> Set All Pixel to ON
-	LCD_command_tx(0xA6); //Display inverse off
+	LCD_TX(CMD, 0x40); //Display start line 0
+	LCD_TX(CMD, 0xA1); //SEG reverse
+	LCD_TX(CMD, 0xC0); //Normal COM0~COM63
+	LCD_TX(CMD, 0xA4); //Disable -> Set All Pixel to ON
+	LCD_TX(CMD, 0xA6); //Display inverse off
 	_delay_ms(120);
-	LCD_command_tx(0xA2); //Set LCD Bias Ratio A2/A3
-	LCD_command_tx(0x2F); //Set Power Control 28...2F
-	LCD_command_tx(0x27); //Set VLCD Resistor Ratio 20...27
-	LCD_command_tx(0x81); //Set Electronic Volume
-	LCD_command_tx(0x10); //Set Electronic Volume 00...3F
-	LCD_command_tx(0xFA); //Set Adv. Program Control
-	LCD_command_tx(0x90); //Set Adv. Program Control x00100yz yz column wrap x Temp Comp
-	LCD_command_tx(0xAF); //Display on
+	LCD_TX(CMD, 0xA2); //Set LCD Bias Ratio A2/A3
+	LCD_TX(CMD, 0x2F); //Set Power Control 28...2F
+	LCD_TX(CMD, 0x27); //Set VLCD Resistor Ratio 20...27
+	LCD_TX(CMD, 0x81); //Set Electronic Volume
+	LCD_TX(CMD, 0x10); //Set Electronic Volume 00...3F
+	LCD_TX(CMD, 0xFA); //Set Adv. Program Control
+	LCD_TX(CMD, 0x90); //Set Adv. Program Control x00100yz yz column wrap x Temp Comp
+	LCD_TX(CMD, 0xAF); //Display on
+
 	return (TRUE);
 }
