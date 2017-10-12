@@ -23,6 +23,12 @@ int currentColumn = COLUMN;
 byte currentPage, currentPixel, currentRegister;
 byte keepPixel = FALSE;
 
+byte frameBuffer[MAX_COLUMN][MAX_PAGE];
+int currentRow = ROW;
+int currentColumn = COLUMN;
+byte currentPage, currentPixel, currentRegister;
+byte keepPixel = FALSE;
+
 byte luminance = BOTTOM;
 
 

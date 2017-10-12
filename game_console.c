@@ -14,6 +14,29 @@ DESCRIPTION:
 
 #define INCREMENT 51
 
+#define MAX_PAGE		8
+#define MAX_COLUMN		102
+
+
+
+#define CMD_PAGE 		0xB0
+#define MAX_PAGE		8
+#define MIN_PAGE 		1
+#define MAX_COL 		102  
+#define MIN_COL			1
+#define CMD_COL_LSB 	0x00
+#define CMD_COL_MSB 	0x10
+#define P_LSB 			0x0F
+#define SHIFT2MSB 		4
+#define CLEAR 			0x00
+
+
+byte row = 0;
+byte page = 0;
+byte column = 0;
+byte pixel = 0;
+byte frame_buffer[MAX_COL][MAX_PAGE];
+
 
 
 //From datasheet P138
@@ -24,7 +47,7 @@ void SPI_MasterInit(void)
 	//P140
 	MOSI_DIR(OUT);
 	SCK_DIR(OUT);
-	PB4_DIR(OUT);
+	PB4_DIR(OUT);//WHY???
 
 	/* Set MOSI and SCK output, all others input */
 //	DDR_SPI = (1 << DD_MOSI) | (1 << DD_SCK); //this doesnt work for some reason
@@ -88,12 +111,12 @@ void LCD_initialise(void)
 	LCD_RST(LOW);
 	_delay_ms(10);
 
-	
+	//page 8 of the DOGLCD manual
 
 	LCD_TX(CMD, 0x40); //Display start line 0
-	LCD_TX(CMD, 0xA1); //SEG reverse
-	LCD_TX(CMD, 0xC0); //Normal COM0~COM63
-	LCD_TX(CMD, 0xA5); //Disable -> Set All Pixel to A5 is to ptint a black screen
+	LCD_TX(CMD, 0xA0); //SEG reverse //A1 is the other orientation
+	LCD_TX(CMD, 0xC8); //Normal COM0~COM63 //C8 is the reversed COM 
+	LCD_TX(CMD, 0xA4); //Disable -> Set All Pixel to A5 is to ptint a black screen
 	LCD_TX(CMD, 0xA6); //Display inverse off
 	_delay_ms(120);
 	LCD_TX(CMD, 0xA2); //Set LCD Bias Ratio A2/A3
@@ -110,6 +133,46 @@ void LCD_initialise(void)
 
 
 	//return (TRUE);
+}
+
+
+void select_column(byte column)
+{
+	byte page_cmd_address_MSB;
+	byte page_cmd_address_LSB;
+
+
+	page_cmd_address_LSB = (CMD_COL_LSB|(column & P_LSB));
+	page_cmd_address_MSB = (CMD_COL_MSB|column >> SHIFT2MSB);
+
+	LCD_TX(CMD,page_cmd_address_LSB);
+	LCD_TX(CMD,page_cmd_address_MSB);
+}
+
+void select_page(byte page)
+{
+	byte page_cmd_address;
+
+	page_cmd_address = (CMD_PAGE|page);
+	LCD_TX(CMD,page_cmd_address);
+
+}
+void LCD_CLR(void)
+{
+
+	byte page;
+	byte column;
+
+	for (page = MIN_PAGE-1; page < MAX_PAGE; page++ )
+	{
+		select_page(page);
+
+		for (column = MIN_COL-1; column < MAX_COL; column++)
+		{	
+			select_column(column);
+			LCD_TX(DAT, CLEAR);
+		}
+	}	
 }
 
 void button_init(void)
@@ -199,6 +262,41 @@ void button_det(void)
 	}
 }
 
+//input is a 8 bit 
+void select_page (byte page)
+{
+	byte page_cmd_address;
+	//the format of the command is set 
+	page_cmd_address =(CMD_PAGE | page);
+	LCD_TX(DAT, page_cmd_address);
+
+
+}
+
+void select_column (byte column)
+{	
+	//P5 
+	//fixed format
+	byte page_cmd_adress_MSB;
+	byte page_cmd_address_LSB;
+	page_cmd_address_LSB =(CMD_COL_LSB | (column&0x0F));
+	page_cmd_address_MSB =(CMD_COL_MSB | (column >> 4));
+	//the whole command is splitted into 2 halves
+	LCD_TX(DAT, page_cmd_address_LSB);
+	LCD_TX(DAT, page_cmd_address_MSB);
+}
+
+
+
+
+
+//GICR, 
+//External
+/*Interrupts P68
+The External Interrupts are triggered by the INT0, INT1, and INT2 pins. Observe that, if enabled,
+the interrupts will trigger even if the INT0..2 pins are configured as outputs. This feature provides
+a way of generating a software interrupt*/
+
 int main(void)
 {
 	/*pin init*/
@@ -214,6 +312,7 @@ int main(void)
 
 	//STUCK HERE
 	LCD_initialise();
+	//LCD_CLR();
 
 	BAT_LOW_LED(OFF);
 	LCD_BACKLIGHT(OFF);

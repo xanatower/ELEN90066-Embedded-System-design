@@ -10,9 +10,9 @@ Main and functions for Game Console basic sample code
 #include "game_console.h"
 
 //global variables
-	byte row = 0;
-	byte page = 0;
-	byte column = 0;
+byte row = 0;
+byte page = 0;
+byte column = 0;
 	byte pixel = 0;
 	byte frame_buffer[MAX_COL][MAX_PAGE];
 	int ADC_BATT_V;
