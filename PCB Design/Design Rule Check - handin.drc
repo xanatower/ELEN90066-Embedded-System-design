@@ -1,0 +1,35 @@
+Protel Design System Design Rule Check
+PCB File : C:\Users\x\Desktop\Embedded System Design\Workshop2\GameConsoleTemplate\Handin\handin.PcbDoc
+Date     : 10/09/2017
+Time     : 1:48:47 AM
+
+Processing Rule : Short-Circuit Constraint (Allowed=No) (All),(All)
+Rule Violations :0
+
+Processing Rule : Un-Routed Net Constraint ( (All) )
+Rule Violations :0
+
+Processing Rule : Clearance Constraint (Gap=10mil) (All),(All)
+Rule Violations :0
+
+Processing Rule : Power Plane Connect Rule(Relief Connect )(Expansion=20mil) (Conductor Width=10mil) (Air Gap=10mil) (Entries=4) (All)
+Rule Violations :0
+
+Processing Rule : Width Constraint (Min=6mil) (Max=1000mil) (Preferred=10mil) (All)
+Rule Violations :0
+
+Processing Rule : Height Constraint (Min=0mil) (Max=7874.016mil) (Prefered=500mil) (All)
+Rule Violations :0
+
+Processing Rule : Hole Size Constraint (Min=15mil) (Max=199mil) (All)
+Rule Violations :0
+
+Processing Rule : Minimum Annular Ring (Minimum=5mil) (All)
+Rule Violations :0
+
+Processing Rule : Width Constraint (Min=15mil) (Max=40mil) (Preferred=20mil) (InNet('VCC'))
+Rule Violations :0
+
+
+Violations Detected : 0
+Time Elapsed        : 00:00:01
